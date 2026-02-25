@@ -1,0 +1,6 @@
+[submodule "datasets/bi-so101-fold-horizontal-set-full-v3"]
+	path = datasets/bi-so101-fold-horizontal-set-full-v3
+	url = https://huggingface.co/datasets/the-sam-uel/bi-so101-fold-horizontal-set-full-v3
+[submodule "lerobot"]
+	path = lerobot
+	url = https://github.com/huggingface/lerobot.git
