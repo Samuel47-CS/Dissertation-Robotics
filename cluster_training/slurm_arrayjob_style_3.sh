@@ -18,7 +18,7 @@
 #SBATCH --cpus-per-task=8
 
 export PATH="$HOME/.local/bin:$PATH"
-set -e # fail fast 
+set -e # fail fast
 echo "Initialising environment"
 rm -rf .venv
 uv venv --python 3.11
@@ -57,7 +57,7 @@ export OUTPUT_DIR=${SCRATCH_HOME}/practical/example
 mkdir -p ${OUTPUT_DIR}
 
 # Training
-uv run Dissertation-Robotics/src/lerobot/scripts/lerobot_train.py \
+uv run Dissertation-Robotics/lerobot/src/lerobot/scripts/lerobot_train.py \
         --dataset.repo_id="the-sam-uel/bi-so101-fold-horizontal-style-3"  \
         --batch_size=64 \
         --steps=20000  \
