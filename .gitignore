@@ -37,42 +37,6 @@ ehthumbs.db
 Thumbs.db
 
 # Files
-datasets/bi-so101-fold-horizontal-set-full-v3
 datasets/csv
 datasets/v2.1\ datasets
-# lerobot/.git 
-# lerobot/.git\ 2/ 
-# lerobot/.github 
-# lerobot/.github\ 2 
-# lerobot/benchmarks 
-# lerobot/.dockerignore 
-# lerobot/.gitattributes 
-# lerobot/.gitignore 
-# lerobot/.pre-commit-config.yaml 
-# lerobot/CODE_OF_CONDUCT.md 
-# lerobot/CONTRIBUTING.md 
-# lerobot/docs-requirements.txt 
-# lerobot/LICENSE 
-# lerobot/Makefile 
-# lerobot/MANIFEST.in 
-# lerobot/pyproject.toml 
-# lerobot/README.md 
-# lerobot/requirements-macos.txt 
-# lerobot/requirements-ubuntu.txt 
-# lerobot/requirements.in 
-# lerobot/SECURITY.md 
-# lerobot/setup.py
-
-# lerobot/benchmarks
-# lerobot/benchmarks\ 2
-# lerobot/docker
-# lerobot/docker\ 2
-# lerobot/docs
-# lerobot/docs\ 2
-# lerobot/examples
-# lerobot/examples\ 2
-# lerobot/media
-# lerobot/media\ 2
-lerobot/src
-
 hardware/
