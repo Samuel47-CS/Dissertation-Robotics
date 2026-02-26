@@ -1,11 +1,11 @@
 #!/bin/bash
 # Author(s): James Owers (james.f.owers@gmail.com)
 
-echo "Starting slurm style 3"
+echo "Starting slurm style 1"
 # ====================
 # Options for sbatch
 # ====================
-#SBATCH --job-name=Style3
+#SBATCH --job-name=Style1
 #SBATCH -o /home/%u/slogs/sl_l_%A.out
 #SBATCH -e /home/%u/slogs/sl_l_%A.out
 #SBATCH -N 1	  # nodes requested
@@ -13,16 +13,16 @@ echo "Starting slurm style 3"
 #SBATCH --nodelist="landonia11"
 #SBATCH --gres=gpu:1  # use 1 GPU
 #SBATCH --mem-per-cpu=6000 # in Mb
-#SBATCH --partition=Teaching
+#SBATCH --partition=Teaching 
 #SBATCH -t 1-00:00:00  # time requested in hour:minute:seconds
 #SBATCH --cpus-per-task=10
 
 export PATH="$HOME/.local/bin:$PATH"
 set -e # fail fast
 echo "Initialising environment"
-rm -rf lerobotenv3
-uv venv lerobotenv3 --python 3.11
-source lerobotenv3/bin/activate
+rm -rf lerobotenv1
+uv venv lerobotenv1 --python 3.11
+source lerobotenv1/bin/activate
 echo "Resolving dependencies"
 uv pip install -q -r Dissertation-Robotics/cluster_training/requirements.txt
 uv pip install -q lerobot
@@ -54,24 +54,24 @@ rsync --archive --update --compress --progress ${DATA_HOME}/ ${DATA_SCRATCH}
 # Run training. Here we use src/gpu.py
 # ====================
 echo "Creating directory to save model weights"
-export OUTPUT_DIR=${SCRATCH_HOME}/style3
+export OUTPUT_DIR=${SCRATCH_HOME}/style1
 mkdir -p ${OUTPUT_DIR}
 
 # Training
 uv run Dissertation-Robotics/lerobot/src/lerobot/scripts/lerobot_train.py \
-        --dataset.repo_id="the-sam-uel/bi-so101-fold-horizontal-style-3"  \
+        --dataset.repo_id="the-sam-uel/bi-so101-fold-horizontal-style-1"  \
         --batch_size=32 \
         --steps=20000  \
-        --job_name="bi_so101_folding_training_style_3" \
-         --policy.device="cuda" \
+        --job_name="bi_so101_folding_training_style_1" \
+        --policy.device="cuda" \
         --policy.type=smolvla \
         --wandb.enable="false" \
-        --policy.repo_id="the-sam-uel/folding-style-3"
+        --policy.repo_id="the-sam-uel/folding-style-1"
 
 # ====================
 # RSYNC data from /disk/scratch/ to /home/. This moves everything we want back onto the distributed file system
 # ====================
-OUTPUT_HOME=${PWD}/exps/style-3
+OUTPUT_HOME=${PWD}/exps/style-1
 mkdir -p ${OUTPUT_HOME}
 rsync --archive --update --compress --progress ${OUTPUT_DIR} ${OUTPUT_HOME}
 
@@ -81,7 +81,7 @@ rsync --archive --update --compress --progress ${OUTPUT_DIR} ${OUTPUT_HOME}
 rm -rf ${OUTPUT_DIR}
 
 deactivate
-rm -rf lerobotenv3
+rm -rf lerobotenv1
 echo "Environment removed"
 
 echo "Job ${SLURM_JOB_ID} is done!"

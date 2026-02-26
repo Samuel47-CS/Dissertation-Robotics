@@ -9,8 +9,9 @@ Subtitle: Teaching a robot to exhibit style throughout a task
 2. Train robot arms on folding (Neural Network)
     - MLP cluster scripts! https://github.com/assistive-autonomy/slurm-cluster-scripts/ - Slides in diss folder
         - Style 2 and 3 still to be trained
-        - sbatch --job-name=folding_model_training_style_2 -o /home/$USER/slogs/sl_%A.out -e /home/$USER/slogs/sl_%A.out -N 1 -n 1 --gres=gpu:1 --mem=32000 --partition=Teaching -t 1-00:00:00 --nodelist="landonia11" --cpus-per-task=8 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
-        - sbatch --job-name=folding_model_training_style_3 -o /home/$USER/slogs/sl_%A.out -e /home/$USER/slogs/sl_%A.out -N 1 -n 1 --gres=gpu:1 --mem=32000 --partition=Teaching -t 1-00:00:00 --nodelist="landonia11" --cpus-per-task=8 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
+        - sbatch --job-name=Style1 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_1.sh
+        - sbatch --job-name=Style2 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
+        - sbatch --job-name=Style3 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
         - sbatch Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
         - sbatch Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
     - Saving files from mlp cluster to local device. scp from mlp cluster to uni account, then uni account to local

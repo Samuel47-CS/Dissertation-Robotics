@@ -20,9 +20,9 @@ echo "Starting slurm style 2"
 export PATH="$HOME/.local/bin:$PATH"
 set -e # fail fast
 echo "Initialising environment"
-rm -rf lerobotenv
-uv venv lerobotenv --python 3.11
-source lerobotenv/bin/activate
+rm -rf lerobotenv2
+uv venv lerobotenv2 --python 3.11
+source lerobotenv2/bin/activate
 echo "Resolving dependencies"
 uv pip install -q -r Dissertation-Robotics/cluster_training/requirements.txt
 uv pip install -q lerobot
@@ -60,10 +60,10 @@ mkdir -p ${OUTPUT_DIR}
 # Training
 uv run Dissertation-Robotics/lerobot/src/lerobot/scripts/lerobot_train.py \
         --dataset.repo_id="the-sam-uel/bi-so101-fold-horizontal-style-2"  \
-        --batch_size=64 \
+        --batch_size=32 \
         --steps=20000  \
         --job_name="bi_so101_folding_training_style_2" \
-         --policy.device="cuda" \
+        --policy.device="cuda" \
         --policy.type=smolvla \
         --wandb.enable="false" \
         --policy.repo_id="the-sam-uel/folding-style-2"
@@ -81,7 +81,7 @@ rsync --archive --update --compress --progress ${OUTPUT_DIR} ${OUTPUT_HOME}
 rm -rf ${OUTPUT_DIR}
 
 deactivate
-rm -rf lerobotenv
+rm -rf lerobotenv2
 echo "Environment removed"
 
 echo "Job ${SLURM_JOB_ID} is done!"
