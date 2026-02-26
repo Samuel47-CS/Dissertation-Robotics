@@ -6,9 +6,9 @@ echo "Starting slurm style 2"
 # Options for sbatch
 # ====================
 
-#SBATCH --job-name=folding_model_training_style_2
-#SBATCH -o /home/%u/slogs/sl_%A.out
-#SBATCH -e /home/%u/slogs/sl_%A.out
+#SBATCH --job-name=Style2
+#SBATCH -o /home/%u/slogs/sl_l_%A.out
+#SBATCH -e /home/%u/slogs/sl_l_%A.out
 #SBATCH -N 1	  # nodes requested
 #SBATCH -n 1	  # tasks requested
 #SBATCH --nodelist="landonia11"
@@ -25,8 +25,8 @@ rm -rf lerobotenv
 uv venv lerobotenv --python 3.11
 source .venv/bin/activate
 echo "Resolving dependencies"
-uv pip install -r -q Dissertation-Robotics/cluster_training/requirements.txt
-uv pip install lerobot
+uv pip install -q -r Dissertation-Robotics/cluster_training/requirements.txt
+uv pip install -q lerobot
 
 echo "Environment initialised and sourced!"
 
@@ -55,7 +55,7 @@ rsync --archive --update --compress --progress ${DATA_HOME}/ ${DATA_SCRATCH}
 # Run training. Here we use src/gpu.py
 # ====================
 echo "Creating directory to save model weights"
-export OUTPUT_DIR=${SCRATCH_HOME}/practical/example
+export OUTPUT_DIR=${SCRATCH_HOME}/style2
 mkdir -p ${OUTPUT_DIR}
 
 # Training
