@@ -1,17 +1,17 @@
 #!/bin/bash
 # Author(s): James Owers (james.f.owers@gmail.com)
 
+echo "Starting slurm style 2"
 # ====================
 # Options for sbatch
 # ====================
 
-#SBATCH --job-name=folding_model_training_style_3
+#SBATCH --job-name=folding_model_training_style_2
 #SBATCH -o /home/$USER/slogs/sl_%A.out
 #SBATCH -e /home/$USER/slogs/sl_%A.out
 #SBATCH -N 1	  # nodes requested
 #SBATCH -n 1	  # tasks requested
-#SBATCH --gres=gpu:nvidia_rtx_a6000  # use 1 GPU
-#SBATCH --nodelist="landonia11"
+#SBATCH --gres=gpu:1  # use 1 GPU
 #SBATCH --mem=32000  # memory in Mb
 #SBATCH --partition=Teaching
 #SBATCH -t 1-00:00:00  # time requested in hour:minute:seconds
@@ -20,11 +20,11 @@
 export PATH="$HOME/.local/bin:$PATH"
 set -e # fail fast
 echo "Initialising environment"
-rm -rf .venv
-uv venv --python 3.11
+#rm -rf .venv
+#uv venv --python 3.11
 source .venv/bin/activate
-uv pip install -r Dissertation-Robotics/cluster_training/requirements.txt
-uv pip install lerobot
+#uv pip install -r Dissertation-Robotics/cluster_training/requirements.txt
+#uv pip install lerobot
 
 echo "Environment initialised and sourced!"
 
@@ -78,5 +78,9 @@ rsync --archive --update --compress --progress ${OUTPUT_DIR} ${OUTPUT_HOME}
 # Finally we cleanup after ourselves by deleting what we created on /disk/scratch/
 # ====================
 rm -rf ${OUTPUT_DIR}
+
+# deactivate
+# rm -rf .venv
+# echo "Environment removed"
 
 echo "Job ${SLURM_JOB_ID} is done!"

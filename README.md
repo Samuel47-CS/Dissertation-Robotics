@@ -11,6 +11,7 @@ Subtitle: Teaching a robot to exhibit style throughout a task
         - Style 2 and 3 still to be trained
         - sbatch --job-name=folding_model_training_style_2 -o /home/$USER/slogs/sl_%A.out -e /home/$USER/slogs/sl_%A.out -N 1 -n 1 --gres=gpu:1 --mem=32000 --partition=Teaching -t 1-00:00:00 --nodelist="landonia11" --cpus-per-task=8 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
         - sbatch --job-name=folding_model_training_style_3 -o /home/$USER/slogs/sl_%A.out -e /home/$USER/slogs/sl_%A.out -N 1 -n 1 --gres=gpu:1 --mem=32000 --partition=Teaching -t 1-00:00:00 --nodelist="landonia11" --cpus-per-task=8 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
+        - #SBATCH --nodelist="landonia11"
         - sbatch Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
         - sbatch Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
     - Saving files from mlp cluster to local device. scp from mlp cluster to uni account, then uni account to local
