@@ -7,10 +7,11 @@ echo "Starting slurm style 2"
 # ====================
 
 #SBATCH --job-name=folding_model_training_style_2
-#SBATCH -o /home/$USER/slogs/sl_%A.out
-#SBATCH -e /home/$USER/slogs/sl_%A.out
+#SBATCH -o /home/%u/slogs/sl_%A.out
+#SBATCH -e /home/%u/slogs/sl_%A.out
 #SBATCH -N 1	  # nodes requested
 #SBATCH -n 1	  # tasks requested
+#SBATCH --nodelist="landonia11"
 #SBATCH --gres=gpu:1  # use 1 GPU
 #SBATCH --mem=32000  # memory in Mb
 #SBATCH --partition=Teaching
@@ -23,7 +24,8 @@ echo "Initialising environment"
 rm -rf lerobotenv
 uv venv lerobotenv --python 3.11
 source .venv/bin/activate
-uv pip install -r Dissertation-Robotics/cluster_training/requirements.txt
+echo "Resolving dependencies"
+uv pip install -r -q Dissertation-Robotics/cluster_training/requirements.txt
 uv pip install lerobot
 
 echo "Environment initialised and sourced!"
