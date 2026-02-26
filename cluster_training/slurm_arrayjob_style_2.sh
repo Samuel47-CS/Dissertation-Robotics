@@ -20,11 +20,11 @@ echo "Starting slurm style 2"
 export PATH="$HOME/.local/bin:$PATH"
 set -e # fail fast
 echo "Initialising environment"
-#rm -rf .venv
-#uv venv --python 3.11
+rm -rf lerobotenv
+uv venv lerobotenv --python 3.11
 source .venv/bin/activate
-#uv pip install -r Dissertation-Robotics/cluster_training/requirements.txt
-#uv pip install lerobot
+uv pip install -r Dissertation-Robotics/cluster_training/requirements.txt
+uv pip install lerobot
 
 echo "Environment initialised and sourced!"
 
@@ -79,8 +79,8 @@ rsync --archive --update --compress --progress ${OUTPUT_DIR} ${OUTPUT_HOME}
 # ====================
 rm -rf ${OUTPUT_DIR}
 
-# deactivate
-# rm -rf .venv
-# echo "Environment removed"
+deactivate
+rm -rf lerobotenv
+echo "Environment removed"
 
 echo "Job ${SLURM_JOB_ID} is done!"
