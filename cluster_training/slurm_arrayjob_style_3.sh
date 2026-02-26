@@ -15,7 +15,7 @@ echo "Starting slurm style 3"
 #SBATCH --mem-per-cpu=6000 # in Mb
 #SBATCH --partition=Teaching
 #SBATCH -t 1-00:00:00  # time requested in hour:minute:seconds
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=10
 
 export PATH="$HOME/.local/bin:$PATH"
 set -e # fail fast

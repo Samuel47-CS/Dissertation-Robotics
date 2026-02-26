@@ -12,10 +12,10 @@ echo "Starting slurm style 2"
 #SBATCH -n 1	  # tasks requested
 #SBATCH --nodelist="landonia11"
 #SBATCH --gres=gpu:1  # use 1 GPU
-#SBATCH --mem-per-cpu=4000 # in Mb
+#SBATCH --mem-per-cpu=6000 # in Mb
 #SBATCH --partition=Teaching 
 #SBATCH -t 1-00:00:00  # time requested in hour:minute:seconds
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=10
 
 export PATH="$HOME/.local/bin:$PATH"
 set -e # fail fast
