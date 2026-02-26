@@ -10,9 +10,9 @@ echo "Starting slurm style 3"
 #SBATCH -e /home/%u/slogs/sl_l_%A.out
 #SBATCH -N 1	  # nodes requested
 #SBATCH -n 1	  # tasks requested
-#SBATCH --gres=gpu:1  # use 1 GPU
 #SBATCH --nodelist="landonia11"
-#SBATCH --mem=32000  # memory in Mb
+#SBATCH --gres=gpu:1  # use 1 GPU
+#SBATCH --mem-per-cpu=6000 # in Mb
 #SBATCH --partition=Teaching
 #SBATCH -t 1-00:00:00  # time requested in hour:minute:seconds
 #SBATCH --cpus-per-task=8

@@ -5,7 +5,6 @@ echo "Starting slurm style 2"
 # ====================
 # Options for sbatch
 # ====================
-
 #SBATCH --job-name=Style2
 #SBATCH -o /home/%u/slogs/sl_l_%A.out
 #SBATCH -e /home/%u/slogs/sl_l_%A.out
@@ -13,8 +12,8 @@ echo "Starting slurm style 2"
 #SBATCH -n 1	  # tasks requested
 #SBATCH --nodelist="landonia11"
 #SBATCH --gres=gpu:1  # use 1 GPU
-#SBATCH --mem=32000  # memory in Mb
-#SBATCH --partition=Teaching
+#SBATCH --mem-per-cpu=4000 # in Mb
+#SBATCH --partition=Teaching 
 #SBATCH -t 1-00:00:00  # time requested in hour:minute:seconds
 #SBATCH --cpus-per-task=8
 
@@ -23,7 +22,7 @@ set -e # fail fast
 echo "Initialising environment"
 rm -rf lerobotenv
 uv venv lerobotenv --python 3.11
-source .venv/bin/activate
+source lerobotenv/bin/activate
 echo "Resolving dependencies"
 uv pip install -q -r Dissertation-Robotics/cluster_training/requirements.txt
 uv pip install -q lerobot
