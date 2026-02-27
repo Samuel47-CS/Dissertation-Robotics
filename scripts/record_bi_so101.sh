@@ -1,0 +1,15 @@
+lerobot-record \
+    --teleop.type=bi_so101_leader \
+    --teleop.left_arm_port=/dev/ttyACM1 \
+    --teleop.right_arm_port=/dev/ttyACM3 \
+    --teleop.id=maria \
+    --robot.type=bi_so101_follower \
+    --robot.left_arm_port=/dev/ttyACM0 \
+    --robot.right_arm_port=/dev/ttyACM2 \
+    --robot.id=curie \
+    --display_data=false \
+    --dataset.repo_id=the-sam-uel/bi-so101-fold-horizontal-set-24 \
+    --dataset.num_episodes=10 \
+    --dataset.reset_time_s=60 \
+    --dataset.episode_time_s=60 \
+    --dataset.single_task="Fold the yellow cloth horizontally"

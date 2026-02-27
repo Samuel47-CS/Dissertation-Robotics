@@ -40,3 +40,4 @@ Thumbs.db
 datasets/csv
 datasets/v2.1\ datasets
 hardware/
+scripts/huggingface_token.txt
