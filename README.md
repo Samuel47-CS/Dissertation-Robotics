@@ -18,8 +18,9 @@ Subtitle: Teaching a robot to exhibit style throughout a task
         - scp -r s2210183@mlp:/home/s2210183/outputs ~/Lerobot/
         - scp -r s2210183@student.ssh.inf.ed.ac.uk:~/Lerobot/ ~/Documents/University/Year\ 4/Dissertation/Training/
 3. Model inference:
-    - Fix async inference pipeline
     - Video examples. Reason the difference in motion (hopefully there is a difference in motion)
+    - Issue with reading the camera: error in streamactions 'observation.images.left_overhead" -> Change name of overhead / path and try again so that training is associated with overhead being a member of "left" cameras
+        - Requires changing in local .cache then pushing back to hf hub
 4. Write up
     - Build narrative for all choices. E.g., i did this -> there was this problem and this was my solution / I had a couple options for an approach for this but decided on this one because this
 
