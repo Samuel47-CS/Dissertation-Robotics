@@ -1,0 +1,87 @@
+#!/bin/bash
+# Author(s): James Owers (james.f.owers@gmail.com)
+
+echo "Starting slurm style 3"
+# ====================
+# Options for sbatch
+# ====================
+#SBATCH --job-name=Stylee
+#SBATCH -o /home/%u/slogs/sl_l_%A.out
+#SBATCH -e /home/%u/slogs/sl_l_%A.out
+#SBATCH -N 1	  # nodes requested
+#SBATCH -n 1	  # tasks requested
+#SBATCH --nodelist="landonia11"
+#SBATCH --gres=gpu:1  # use 1 GPU
+#SBATCH --mem-per-cpu=6000 # in Mb
+#SBATCH --partition=Teaching
+#SBATCH -t 1-00:00:00  # time requested in hour:minute:seconds
+#SBATCH --cpus-per-task=10
+
+export PATH="$HOME/.local/bin:$PATH"
+set -e # fail fast
+echo "Initialising environment"
+rm -rf lerobotenvX
+uv venv lerobotenvX --python 3.11
+source lerobotenvX/bin/activate
+echo "Resolving dependencies"
+uv pip install -q -r Dissertation-Robotics/cluster_training/requirements.txt
+uv pip install -q lerobot
+
+echo "Environment initialised and sourced!"
+
+# =====================
+# Logging information
+# =====================
+# slurm info - more at https://slurm.schedmd.com/sbatch.html#lbAJ
+dt=$(date '+%d_%m_%y_%H_%M');
+echo "I am job ${SLURM_JOB_ID}"
+echo "I'm running on ${SLURM_JOB_NODELIST}"
+echo "Job started at ${dt}"
+
+## create data in pwd base on the util script
+mkdir -p data
+
+# ====================
+# RSYNC data from /home/ to /disk/scratch/
+# ====================
+export SCRATCH_HOME=/disk/scratch/${USER}
+export DATA_HOME=${PWD}/data
+export DATA_SCRATCH=${SCRATCH_HOME}/practical/data
+mkdir -p ${SCRATCH_HOME}/practical/data
+rsync --archive --update --compress --progress ${DATA_HOME}/ ${DATA_SCRATCH}
+
+# ====================
+# Run training. Here we use src/gpu.py
+# ====================
+echo "Creating directory to save model weights"
+export OUTPUT_DIR=${SCRATCH_HOME}/style3
+mkdir -p ${OUTPUT_DIR}
+
+# Training
+uv run Dissertation-Robotics/lerobot/src/lerobot/scripts/lerobot_train.py \
+        --dataset.repo_id="the-sam-uel/stylised-dataset"  \
+        --batch_size=32 \
+        --steps=20000  \
+        --job_name="stylised_folding" \
+         --policy.device="cuda" \
+        --policy.type=smolvla \
+        --wandb.enable="false" \
+        --policy.repo_id="the-sam-uel/folding-stylised"
+
+# ====================
+# RSYNC data from /disk/scratch/ to /home/. This moves everything we want back onto the distributed file system
+# ====================
+OUTPUT_HOME=${PWD}/exps/style-X
+mkdir -p ${OUTPUT_HOME}
+rsync --archive --update --compress --progress ${OUTPUT_DIR} ${OUTPUT_HOME}
+
+# ====================
+# Finally we cleanup after ourselves by deleting what we created on /disk/scratch/
+# ====================
+rm -rf ${OUTPUT_DIR}
+
+deactivate
+rm -rf lerobotenvX
+echo "Environment removed"
+
+echo "Job ${SLURM_JOB_ID} is done!"
