@@ -12,6 +12,7 @@ Subtitle: Teaching a robot to exhibit style throughout a task
         - sbatch --job-name=Style1 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_1.sh
         - sbatch --job-name=Style2 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
         - sbatch --job-name=Style3 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
+        - sbatch --job-name=Stylee -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_dataset.sh
         - sbatch Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
         - sbatch Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
     - Saving files from mlp cluster to local device. scp from mlp cluster to uni account, then uni account to local
@@ -22,7 +23,8 @@ Subtitle: Teaching a robot to exhibit style throughout a task
     - Issue with reading the camera: error in streamactions 'observation.images.left_overhead" -> Change name of overhead / path and try again so that training is associated with overhead being a member of "left" cameras
         - Requires changing in local .cache then pushing back to hf hub
         - Error in StreamActions: 'observation.images.left_overhead'
-4. Write up
+4. Update clustering to also grab the Dict version of episodes and styles with task descriptions
+5. Write up
     - Build narrative for all choices. E.g., i did this -> there was this problem and this was my solution / I had a couple options for an approach for this but decided on this one because this
 
 

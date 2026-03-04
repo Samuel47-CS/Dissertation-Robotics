@@ -8,7 +8,7 @@ from tslearn.metrics import dtw
 DATAPATH = "datasets/csv/"
 CSV_STRING = "ep{i}.csv"
 
-# Hyper-parameters tuned with Optuna optimiser
+# Hyper-parameters tuned with Optuna optimiser for the original dataset used for this research and Bi-SO101 arms 
 CLUSTERS = 3
 
 PHASE_WEIGHTS = {
@@ -243,8 +243,8 @@ def weighted_episode_dtw_distance(
 
 
 def get_clusters(episodes_df, 
-                 phase_weights = PHASE_WEIGHTS, 
-                 joint_weights = JOINT_WEIGHTS,
+                 phase_weights=PHASE_WEIGHTS, 
+                 joint_weights=JOINT_WEIGHTS,
                  clusters=CLUSTERS):
     
     D = weighted_episode_dtw_distance(
@@ -270,7 +270,20 @@ def get_clusters(episodes_df,
         R = list(episodes_df[(episodes_df["cluster"] != i)].index)
         clusters.append((C, R))
 
-    return clusters
+    unique_clusters = sorted(c for c in episodes_df["cluster"].unique() if c != -1)
+
+    cluster_name_map = {
+        cluster: [i]
+        for i, cluster in enumerate(unique_clusters)
+    }
+
+    cluster_dict = {
+        str(row.episode_id): f"Fold the yellow cloth horizontally with style {cluster_name_map[row.cluster]}"
+        for row in episodes_df.itertuples()
+        if row.cluster != -1
+    }
+
+    return clusters, cluster_dict
 
 
 
@@ -281,7 +294,10 @@ def main():
     episodes_df = remove_bad_episodes(episodes_df, [8, 145]) # Currently handpicked
 
     print("Getting clusters")
-    clusters = get_clusters(episodes_df)
+    clusters, cluster_dict = get_clusters(episodes_df)
+
+    print(cluster_dict)
+    print()
 
 
     for i, cluster in enumerate(clusters):
@@ -290,7 +306,7 @@ def main():
         print(f"Episodes to be removed from original dataset to create cluster {i+1}:")
         print(cluster[1])
         print()
-    return clusters
+    return clusters, cluster_dict
 
 if __name__ == "__main__":
     main()
