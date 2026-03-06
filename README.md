@@ -19,10 +19,16 @@ Subtitle: Teaching a robot to exhibit style throughout a task
     - Build narrative for all choices. E.g., i did this -> there was this problem and this was my solution / I had a couple options for an approach for this but decided on this one because this
 
 
-- Success Criteria
-    - Prompting the policy with the task + some style indicator causes the robot to:
-        1. Fold the cloth successfully (imperfect folds are okay)
-        2. Fold the cloth in a manner corresponding with the prompted style indicator
+### Model editing
+Where to change observation.images.overhead:
+- config.json
+    - observation.state
+Where to remove arguments:
+
+## Succes Criteria
+- Prompting the policy with the task + some style indicator causes the robot to:
+    1. Fold the cloth successfully (imperfect folds are okay)
+    2. Fold the cloth in a manner corresponding with the prompted style indicator
 
 
 ## What I have done 
