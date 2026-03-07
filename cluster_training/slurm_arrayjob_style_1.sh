@@ -60,7 +60,7 @@ mkdir -p ${OUTPUT_DIR}
 # Training
 uv run Dissertation-Robotics/lerobot/src/lerobot/scripts/lerobot_train.py \
         --dataset.repo_id="the-sam-uel/bi-so101-fold-horizontal-style-1"  \
-        --dataset.rename_mapping='{"observation.images.left_overhead":"observation.images.overhead"}' \
+        --rename_mapping='{"observation.images.left_overhead":"observation.images.overhead"}' \
         --batch_size=32 \
         --steps=20000  \
         --job_name="bi_so101_folding_training_style_1" \
