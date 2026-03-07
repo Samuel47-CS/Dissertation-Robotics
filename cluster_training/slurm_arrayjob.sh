@@ -6,10 +6,10 @@
 # ====================
 
 
-sbatch --job-name=Style1 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=3 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_1.sh
-sbatch --job-name=Style2 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=3 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
-sbatch --job-name=Style3 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=3 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
-sbatch --job-name=Stylee -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=3 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_dataset.sh
+sbatch --job-name=Style1 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=2 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_1.sh
+sbatch --job-name=Style2 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=2 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
+sbatch --job-name=Style3 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=2 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
+sbatch --job-name=Stylee -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=2 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_dataset.sh
 
 # scp -r s2210183@mlp:/home/s2210183/outputs ~/Lerobot/
 # scp -r s2210183@student.ssh.inf.ed.ac.uk:~/Lerobot/ ~/Documents/University/Year\ 4/Dissertation/Training/
@@ -68,7 +68,7 @@ mkdir -p ${OUTPUT_DIR}
 # Training
 uv run Dissertation-Robotics/src/lerobot/scripts/lerobot_train.py \
         --dataset.repo_id="the-sam-uel/bi-so101-fold-horizontal-set-full"  \
-        --rename_mapping='{"observation.images.left_overhead":"observation.images.overhead"}' \
+        --rename_map='{"observation.images.left_overhead":"observation.images.overhead"}' \
         --batch_size=32 --steps=20000  \
         --job_name="bi_so101_folding_training"  \
         --policy.device="cuda" \
