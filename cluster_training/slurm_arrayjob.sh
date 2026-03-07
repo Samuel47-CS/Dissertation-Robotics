@@ -6,10 +6,10 @@
 # ====================
 
 
-# sbatch --job-name=Style1 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_1.sh
-# sbatch --job-name=Style2 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
-# sbatch --job-name=Style3 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
-# sbatch --job-name=Stylee -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1 --nodelist="landonia25" --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=10 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_dataset.sh
+sbatch --job-name=Style1 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=6 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_1.sh
+sbatch --job-name=Style2 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=6 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
+sbatch --job-name=Style3 -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=6 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
+sbatch --job-name=Stylee -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=6 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_dataset.sh
 
 # scp -r s2210183@mlp:/home/s2210183/outputs ~/Lerobot/
 # scp -r s2210183@student.ssh.inf.ed.ac.uk:~/Lerobot/ ~/Documents/University/Year\ 4/Dissertation/Training/
@@ -24,7 +24,7 @@
 #SBATCH --mem=32000  # memory in Mb
 #SBATCH --partition=Teaching
 #SBATCH -t 1-00:00:00  # time requested in hour:minute:seconds
-#SBATCH --cpus-per-task=8
+
 
 export PATH="$HOME/.local/bin:$PATH"
 set -e # fail fast 
