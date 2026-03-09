@@ -148,8 +148,6 @@ def extract_all_data(data_get_path=DATA_GET_PATH, csv_save_path=CSV_SAVE_PATH, s
 
     TODO: Source 
     '''
-    
-
     if setname is None:
 
         num_sets = len(os.listdir(data_get_path))
@@ -162,7 +160,6 @@ def extract_all_data(data_get_path=DATA_GET_PATH, csv_save_path=CSV_SAVE_PATH, s
             for j in range(num_episodes):
                 print(f"Extracting motor control data from episode {j + i*10}") # TODO: probably change the display here
                 extract_states_and_timestamps(data_get_path + SETNAME.format(set=i+1), csv_save_path, j, i)
-
 
     else:
         filepath = data_get_path + SETNAME.format(set=setname) + "meta/info.json"
