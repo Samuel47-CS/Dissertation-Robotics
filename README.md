@@ -85,5 +85,22 @@ Where to remove arguments:
         - Can I then merge these models to a 'super-model' ?
     - Model evaluation:
         - Updating and fixing async-inference pipeline to use finetuned smolvla model 
+        - added rename_map to training because of the config change between data collection and deployment
 - Thought for future work:
     - Subsets of episodes for training data do not need to be exclusive per style. As in an episode could be able to belong to multiple styles. Then, how do you find 
+
+### Changes to lerobot code required for rename map to work
+
+change to lerobot/policies/factory.py line 469
+```
+if rename_map:
+        features = {rename_map.get(k, k): v for k, v in features.items()}
+```
+
+change to lerobot/scripts/lerobot_train.py line 287
+```
+if cfg.rename_map:
+        pre = processor_kwargs.setdefault("preprocessor_overrides", {})
+        pre["rename_observations_processor"] = {"rename_map": cfg.rename_map}
+
+```
