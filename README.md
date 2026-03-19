@@ -86,6 +86,8 @@ Where to remove arguments:
     - Model evaluation:
         - Updating and fixing async-inference pipeline to use finetuned smolvla model 
         - added rename_map to training because of the config change between data collection and deployment
+            - didn't work
+        - wrote a manual model rename mapping script that handls .json, .parquet and .safetensors
 - Thought for future work:
     - Subsets of episodes for training data do not need to be exclusive per style. As in an episode could be able to belong to multiple styles. Then, how do you find 
 

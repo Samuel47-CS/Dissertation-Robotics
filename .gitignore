@@ -37,6 +37,9 @@ ehthumbs.db
 Thumbs.db
 
 # Files
+.vscode
+cluster_training/models
+manual_renaming.py
 datasets/csv
 datasets/images
 datasets/v2.1\ datasets

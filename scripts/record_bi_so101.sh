@@ -4,8 +4,10 @@ lerobot-record \
     --teleop.right_arm_port=/dev/ttyACM3 \
     --teleop.id=maria \
     --robot.type=bi_so101_follower \
-    --robot.left_arm_port=/dev/ttyACM0 \
-    --robot.right_arm_port=/dev/ttyACM2 \
+    --robot.left_arm_config.port=/dev/ttyACM0 \
+    --robot.right_arm_config.port=/dev/ttyACM2 \
+    --robot.left_arm_config.cameras='{wrist: {"type": "opencv", "index_or_path": 8, "width": 480, "height": 640, "fps": 30, "rotation": ROTATE_270}}' \
+    --robot.right_arm_config.cameras='{wrist: {"type": "opencv", "index_or_path": 6, "width": 480, "height": 640, "fps": 30, "rotation": ROTATE_270}, overhead {"type": "intelrealsense", "serial_number_or_name": 318122300856, "width": 640, "height": 480, "fps": 15, "rotation": NO_ROTATION, "color_mode": RGB}}' \
     --robot.id=curie \
     --display_data=false \
     --dataset.repo_id=the-sam-uel/bi-so101-fold-horizontal-set-24 \
