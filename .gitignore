@@ -39,10 +39,7 @@ Thumbs.db
 # Files
 .vscode
 cluster_training/models
-manual_renaming.py
-datasets/csv
-datasets/images
-datasets/v2.1\ datasets
+datasets/*/
 hardware/
 scripts/huggingface_token.txt
 models/*/
