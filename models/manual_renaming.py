@@ -1,66 +1,86 @@
-import os
+"""Script to rename occurrences of a target identifier inside model metadata files."""
+
+import argparse
+from pathlib import Path
+
 import pandas as pd
 from safetensors import safe_open
 from safetensors.torch import save_file
 
-MODELS_DIR = 'models/'
-TARGET = 'wrist.right'
-REPLACEMENT = 'right_wrist'
+DEFAULT_MODELS_DIR = Path("models")
+TARGET = "wrist.right"
+REPLACEMENT = "right_wrist"
+
+
+def rename_string(value, target=TARGET, replacement=REPLACEMENT):
+    if isinstance(value, str) and target in value:
+        return value.replace(target, replacement)
+    return value
+
 
 def process_json(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
-        data = f.read()
-    if TARGET in data:
-        data = data.replace(TARGET, REPLACEMENT)
-        with open(file_path, 'w', encoding='utf-8') as f:
-            f.write(data)
+    file_path = Path(file_path)
+    text = file_path.read_text(encoding="utf-8")
+    if TARGET in text:
+        file_path.write_text(text.replace(TARGET, REPLACEMENT), encoding="utf-8")
+
 
 def process_parquet(file_path):
+    file_path = Path(file_path)
     df = pd.read_parquet(file_path)
-    df = df.map(lambda x: x.replace(TARGET, REPLACEMENT) if isinstance(x, str) and TARGET in x else x)
-    df.to_parquet(file_path)
+    df = df.applymap(rename_string)
+    df.columns = [rename_string(col) for col in df.columns]
+    df.to_parquet(file_path, index=False)
+
 
 def process_safetensor(file_path):
-    with safe_open(file_path, framework="pt", device="cpu") as f:
-        tensors = {k: f.get_tensor(k) for k in f.keys()}
-        metadata = f.metadata()  
+    file_path = Path(file_path)
+    with safe_open(file_path, framework="pt", device="cpu") as source:
+        tensors = {name.replace(TARGET, REPLACEMENT): source.get_tensor(name) for name in source.keys()}
+        metadata = source.metadata()
 
-    # Rename tensor keys if they contain TARGET
-    new_tensors = {}
-    for k, v in tensors.items():
-        new_k = k.replace(TARGET, REPLACEMENT)
-        new_tensors[new_k] = v
-
-    # Replace in metadata strings if they contain TARGET
-    new_metadata = {}
+    new_metadata = None
     if metadata:
-        for k, v in metadata.items():
-            new_k = k.replace(TARGET, REPLACEMENT)
-            if isinstance(v, str):
-                new_v = v.replace(TARGET, REPLACEMENT)
-            else:
-                new_v = v
-            new_metadata[new_k] = new_v
-    else:
-        new_metadata = None
+        new_metadata = {
+            rename_string(key): rename_string(value)
+            for key, value in metadata.items()
+        }
 
-    # Save back with renamed tensors and updated metadata
-    save_file(new_tensors, file_path, metadata=new_metadata)
+    save_file(tensors, file_path, metadata=new_metadata)
 
-if __name__ == '__main__':
 
-    print(f"Renaming occurrance of '{TARGET}' to '{REPLACEMENT}'")
+def process_model_files(models_dir=DEFAULT_MODELS_DIR):
+    models_dir = Path(models_dir)
+    for model_dir in sorted(models_dir.iterdir()):
+        if not model_dir.is_dir():
+            continue
+        print(f"Processing model directory: {model_dir.name}")
+        for file_path in model_dir.rglob("*"):
+            if file_path.suffix == ".json":
+                process_json(file_path)
+            elif file_path.suffix == ".parquet":
+                process_parquet(file_path)
+            elif file_path.suffix == ".safetensors":
+                process_safetensor(file_path)
 
-    for model_dir in os.listdir(MODELS_DIR):
-        model_path = os.path.join(MODELS_DIR, model_dir)
-        if os.path.isdir(model_path):
-            print(model_dir)
-            for root, _, files in os.walk(model_path):
-                for file in files:
-                    file_path = os.path.join(root, file)
-                    if file.endswith('.json'):
-                        process_json(file_path)
-                    elif file.endswith('.parquet'):
-                        process_parquet(file_path)
-                    elif file.endswith('.safetensors'):
-                        process_safetensor(file_path)
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Rename target identifiers in model metadata files."
+    )
+    parser.add_argument(
+        "--models-dir",
+        default=str(DEFAULT_MODELS_DIR),
+        help="Directory containing model subdirectories to process.",
+    )
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+    print(f"Renaming occurrences of '{TARGET}' to '{REPLACEMENT}' in {args.models_dir}")
+    process_model_files(args.models_dir)
+
+
+if __name__ == "__main__":
+    main()

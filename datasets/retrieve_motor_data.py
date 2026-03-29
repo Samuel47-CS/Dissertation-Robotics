@@ -1,100 +1,70 @@
-import pandas as pd
-import numpy as np
+"""Tools for extracting motor state data and relabeling dataset metadata."""
+
+import argparse
 import json
-import os
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 TASK_TEMPLATE = "Fold the yellow cloth horizontally."
-# TASK_TEMPLATE = "Fold the yellow cloth horizontally. EP{ep}"
 TASK_TEMPLATE_STYLE = "Fold the yellow cloth horizontally. Style: axis 1 {PC0}, axis 2 {PC1}"
-SETNAME = "bi-so101-fold-horizontal-set-{set}/"
-DATA_GET_PATH = "datasets/"
-CSV_SAVE_PATH= "datasets/csv/"
+SETNAME = "bi-so101-fold-horizontal-set-{set}"
+DATA_GET_PATH = Path("datasets")
+CSV_SAVE_PATH = Path("datasets/csv")
 
-
-# --------------- Relabelling -----------------
 
 def change_task_descriptions_from_episode(dataset_path, PC_values=None):
+    dataset_path = Path(dataset_path)
+    info_path = dataset_path / "info.json"
 
-    infopath = dataset_path + "info.json"
-
-    with open(infopath, "r") as f:
+    with open(info_path, "r", encoding="utf-8") as f:
         num_episodes = json.load(f)["total_episodes"]
 
     for episode in range(num_episodes):
-        relabel_tasks(dataset_path + "tasks.jsonl", episode, PC_values)
-        relabel_episode_task_descriptions(dataset_path + "episodes.jsonl", episode, PC_values)
-        reindex_ep_stats(dataset_path + "episodes_stats.jsonl", episode)
+        relabel_tasks(dataset_path / "tasks.jsonl", episode, PC_values)
+        relabel_episode_task_descriptions(dataset_path / "episodes.jsonl", episode, PC_values)
+        reindex_ep_stats(dataset_path / "episodes_stats.jsonl", episode)
 
 
 def reindex_ep_stats(filepath, episode=0):
-    '''
-    Replaced task indices in episode statistic metadata with task index
-    corresponding to the episode number in episode_stats.jsonl
-    
-    :param filepath: File path from top level (Robotics directory) into relevant 
-    datasets meta data episode statistics
-    :param episode: Episode index
-    '''
-    if type(episode) is not int:
-        episode = int(episode)
+    """Update episode statistics metadata to match the current episode index."""
+    filepath = Path(filepath)
+    episode = int(episode)
 
-    with open(filepath, "r") as f:
-        lines = f.readlines()
-
+    lines = filepath.read_text(encoding="utf-8").splitlines(keepends=True)
     obj = json.loads(lines[episode])
     obj["stats"]["task_index"]["min"] = [episode]
     obj["stats"]["task_index"]["max"] = [episode]
     obj["stats"]["task_index"]["mean"] = [float(episode)]
-    
     lines[episode] = json.dumps(obj) + "\n"
+    filepath.write_text("".join(lines), encoding="utf-8")
 
-    with open(filepath, "w") as f:
-        f.writelines(lines)
 
 def relabel_episode_task_descriptions(filepath, episode=0, PC_values=None):
-    '''
-    Replace task desciption corresponding with the episode in episode.jsonl
-    
-    :param filepath: File path from top level (Robotics directory) into relevant 
-    datasets meta data episode description
-    :param episode: Episode index
-    :param PC_values: Values aqcuired from PCA
-    '''
-    if type(episode) is not int:
-        episode = int(episode)
+    """Replace a single episode description entry in episodes.jsonl."""
+    filepath = Path(filepath)
+    episode = int(episode)
 
-    with open(filepath, "r") as f:
-        lines = f.readlines()
-
+    lines = filepath.read_text(encoding="utf-8").splitlines(keepends=True)
     obj = json.loads(lines[episode])
     if PC_values is None:
         obj["tasks"] = [TASK_TEMPLATE.format(ep=episode)]
     else:
         assert len(PC_values) == 2
-        obj["tasks"] = [TASK_TEMPLATE_STYLE.format(PC0=PC_values[0], PC1=PC_values[1])]
-
+        obj["tasks"] = [
+            TASK_TEMPLATE_STYLE.format(PC0=PC_values[0], PC1=PC_values[1])
+        ]
     lines[episode] = json.dumps(obj) + "\n"
-
-    with open(filepath, "w") as f:
-        f.writelines(lines)
+    filepath.write_text("".join(lines), encoding="utf-8")
 
 
 def relabel_tasks(filepath, episode=0, PC_values=None):
-    '''
-    Relabels task indices and task descriptions based on principal components
-    in tasks.jsonl
-    
-    :param filepath: File path from top level (Robotics directory) into relevant 
-    datasets meta data task description
-    :param episode: Episode index
-    :param PC_values: Values aqcuired from PCA
-    '''
-    if type(episode) is not int:
-        episode = int(episode)
+    """Relabel the task index and description for a single tasks.jsonl entry."""
+    filepath = Path(filepath)
+    episode = int(episode)
 
-    with open(filepath, "r") as f:
-        lines = f.readlines()
-
+    lines = filepath.read_text(encoding="utf-8").splitlines(keepends=True)
     obj = json.loads(lines[episode])
     obj["task_index"] = episode
     if PC_values is None:
@@ -102,81 +72,67 @@ def relabel_tasks(filepath, episode=0, PC_values=None):
     else:
         assert len(PC_values) == 2
         obj["task"] = TASK_TEMPLATE_STYLE.format(PC0=PC_values[0], PC1=PC_values[1])
-
     lines[episode] = json.dumps(obj) + "\n"
-
-    with open(filepath, "w") as f:
-        f.writelines(lines)
+    filepath.write_text("".join(lines), encoding="utf-8")
 
 
-# --------------- Data Extraction -----------------
+def extract_states_and_timestamps(data_get_path, csv_save_path, episode, setnumber=0):
+    """Extract motor state and timestamp data from a parquet episode file."""
+    data_get_path = Path(data_get_path)
+    csv_save_path = Path(csv_save_path)
+    episode = int(episode)
+    episode_id = episode + 10 * setnumber
+    episode_str = str(episode).zfill(6)
 
-def extract_states_and_timestamps(data_get_path, csv_save_path, episode=None, setnumber=0):
-    '''
-    Saves data in (X x 13) shape, where first column is timestamps, and the 
-    next 12 are motor controls corresponding to the timestamps
-    
-    :param data_get_path: Path to episode data
-    :param csv_save_path: Path to csv directory 
-    :param episode: Episode index
-    '''
-    assert episode is not None
-    if type(episode) is int:
-        episode_id = str(episode + 10*setnumber)
-        episode = str(episode)
-    else:
-        episode_id = str(int(episode) + 10*setnumber)
-        
-
-    df = pd.read_parquet(data_get_path+f'data/chunk-000/episode_{episode.zfill(6)}.parquet')
+    parquet_path = data_get_path / "data" / "chunk-000" / f"episode_{episode_str}.parquet"
+    df = pd.read_parquet(parquet_path)
     states = np.vstack([np.asarray(s) for s in df["observation.state"]])
     timestamps = np.array(df["timestamp"]).reshape(-1, 1)
     data = np.hstack((timestamps, states))
-    rdf = pd.DataFrame(data, columns=["timestamp"] + [f"joint_{i+1}" for i in range(states.shape[1])])
-    rdf.to_csv(csv_save_path + f'ep{episode_id}.csv', index=False)
-
+    columns = ["timestamp"] + [f"joint_{i+1}" for i in range(states.shape[1])]
+    rdf = pd.DataFrame(data, columns=columns)
+    output_path = csv_save_path / f"ep{episode_id}.csv"
+    rdf.to_csv(output_path, index=False)
 
 
 def extract_all_data(data_get_path=DATA_GET_PATH, csv_save_path=CSV_SAVE_PATH, setname=None):
-    '''
-    Clips motor control sequence data into dataset of timestamps and motor 
-    positions. Saves data into individual .csv files based on episode into 
-    .csv directory.
-    
-    :param data_get_path: Path to episode data
-    :param csv_save_path: Path to csv directory 
+    """Extract episode CSV files from the dataset directory structure."""
+    data_get_path = Path(data_get_path)
+    csv_save_path = Path(csv_save_path)
+    csv_save_path.mkdir(parents=True, exist_ok=True)
 
-    TODO: Source 
-    '''
     if setname is None:
-
-        num_sets = len(os.listdir(data_get_path))
-        for i in range(num_sets):
-            filepath = data_get_path + SETNAME.format(set=i+1) + "meta/info.json"
-            
-            with open(filepath, "r") as f:
-                num_episodes = json.load(f)["total_episodes"]
-
-            for j in range(num_episodes):
-                print(f"Extracting motor control data from episode {j + i*10}") # TODO: probably change the display here
-                extract_states_and_timestamps(data_get_path + SETNAME.format(set=i+1), csv_save_path, j, i)
-
+        dataset_dirs = sorted(
+            p.parent
+            for p in data_get_path.glob("bi-so101-fold-horizontal-set-*/meta/info.json")
+        )
     else:
-        filepath = data_get_path + SETNAME.format(set=setname) + "meta/info.json"
+        dataset_dirs = [data_get_path / SETNAME.format(set=setname)]
 
-        with open(filepath, "r") as f:
+    for dataset_dir in dataset_dirs:
+        info_path = dataset_dir / "meta" / "info.json"
+        with open(info_path, "r", encoding="utf-8") as f:
             num_episodes = json.load(f)["total_episodes"]
 
-        for j in range(num_episodes):
-            print(f"Extracting motor control data from episode {j}") # TODO: probably change the display here
-            extract_states_and_timestamps(data_get_path + SETNAME.format(set=setname), csv_save_path, j)
-
-
+        for episode in range(num_episodes):
+            print(
+                f"Extracting motor control data from episode {episode} in {dataset_dir.name}"
+            )
+            extract_states_and_timestamps(dataset_dir, csv_save_path, episode)
 
 
 def main():
-    extract_all_data(setname="full")
-    # change_task_descriptions_from_episode(DATA_GET_PATH + "bi-so101-fold-horizontal-set-full/" + "meta/")
+    parser = argparse.ArgumentParser(
+        description="Extract CSV files from dataset episodes."
+    )
+    parser.add_argument(
+        "--setname",
+        default="full",
+        help="Set name to extract, e.g. full or 1.",
+    )
+    args = parser.parse_args()
+    extract_all_data(setname=args.setname)
+
 
 if __name__ == "__main__":
     main()

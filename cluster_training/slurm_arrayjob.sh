@@ -5,26 +5,14 @@
 # Options for sbatch
 # ====================
 
-rm -rf lerobotenv1
-rm -rf lerobotenv2
-rm -rf lerobotenv3
-rm -rf lerobotenvX
-
-
-sbatch --job-name=Style1Act -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=2 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_1.sh
-sbatch --job-name=Style2Act -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=2 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_2.sh
-sbatch --job-name=Style3Act -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=2 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_3.sh
-sbatch --job-name=StyleeAct -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=2 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_dataset.sh
-
-# scp -r s2210183@mlp:/home/s2210183/outputs ~/Lerobot/
-# scp -r s2210183@student.ssh.inf.ed.ac.uk:~/Lerobot/ ~/Documents/University/Year\ 4/Dissertation/Training/
+# sbatch --job-name=Style1Act -o /home/$USER/slogs/sl_l_%A.out -e /home/$USER/slogs/sl_l_%A.out -N 1 -n 1  --gres=gpu:1 --mem-per-cpu=6000 --partition=Teaching -t 1-00:00:00  --cpus-per-task=2 Dissertation-Robotics/cluster_training/slurm_arrayjob_style_1.sh
 
 #SBATCH --job-name=folding_model_training
 #SBATCH -o /home/$USER/slogs/sl_%A.out
 #SBATCH -e /home/$USER/slogs/sl_%A.out
 #SBATCH -N 1	  # nodes requested
 #SBATCH -n 1	  # tasks requested
-#SBATCH --gres=gpu:nvidia_rtx_a6000  # use 1 GPU
+#SBATCH --gres=gpu:1  # use 1 GPU
 #SBATCH --nodelist="landonia11"
 #SBATCH --mem=32000  # memory in Mb
 #SBATCH --partition=Teaching

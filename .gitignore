@@ -19,6 +19,7 @@
 *.rar
 *.tar
 *.zip
+*.vscode
 
 # Logs and databases #
 ######################
@@ -38,7 +39,6 @@ Thumbs.db
 
 # Files
 .vscode
-cluster_training/models
 datasets/*/
 hardware/
 scripts/huggingface_token.txt
