@@ -32,21 +32,19 @@ pip install -r training/requirements.txt
 5. Evaluate task success and behavioural differences
 
 ## Repository Structure
-.
-
-├── clustering/           # Dataframe extraction from Hugging Face datasets, as well as data analysis and clusetering scripts
-
-├── data/                 # Where datasets should live. Contains scripts for dataset manipulation
-
-├── lerobot/              # Pointer to LeRobot github submodule
-
-├── models/               # Where models should live. Contains a script to manually rename model attributes (e.g., camera names)
-
-├── scripts/              # LeRobot CLI command bash scripts for all required functionalities required for this project
-
-├── videos/               # Videos of trained Bi-SO101 arms with different styles.
-
-└── README.md
+- clustering
+    - Dataframe extraction from Hugging Face datasets, as well as data analysis and clusetering scripts
+- data
+    - Where datasets should live. Contains scripts for dataset manipulation
+- lerobot
+    - Pointer to LeRobot github submodule
+- models
+    - Where models should live. Contains a script to manually rename model attributes (e.g., camera names)
+- scripts
+    - LeRobot CLI command bash scripts for all required functionalities required for this project
+- videos
+    - Videos of trained Bi-SO101 arms with different styles.
+- README.md
 
 ### Useful Links:
 - Hugging Face account that contains the full dataset and all models used in this project: https://huggingface.co/the-sam-uel
