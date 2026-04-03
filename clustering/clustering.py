@@ -6,14 +6,15 @@ clusters episodes using agglomerative clustering.
 """
 
 from pathlib import Path
-
-import numpy as np
+import os
 import pandas as pd
-from scipy.signal import medfilt, savgol_filter
+import numpy as np
 from sklearn.cluster import AgglomerativeClustering
+from pathlib import Path
+from scipy.signal import medfilt, savgol_filter
 from tslearn.metrics import dtw
 
-DATAPATH = Path("datasets/csv")
+DATAPATH = Path("data/csv")
 CSV_STRING = "ep{i}.csv"
 
 """These hyperparameters were tuned relative to the dataset used for my research.
@@ -44,110 +45,120 @@ JOINT_WEIGHTS = {
 }
 
 
-def create_df(datapath=DATAPATH, csv_string=CSV_STRING):
-    """Load episode CSV files and assemble a DataFrame."""
-    datapath = Path(datapath)
-    csv_files = sorted(datapath.glob("*.csv"))
+def create_df():
+    _, _, files = next(os.walk(DATAPATH))
+    num_files = len(files)
 
     rows = []
-    for episode_id, csv_file in enumerate(csv_files):
-        frame = pd.read_csv(csv_file)
-        states = frame.drop(columns=["timestamp"])
+    for i in range(num_files):
+        f = pd.read_csv(DATAPATH / CSV_STRING.format(i=i))
+
+        # Colect states and timestamps
+        states = f.drop(columns=["timestamp"])
         states = pd.DataFrame.from_dict(median_filter_episode(states))
         states = pd.DataFrame.from_dict(savgol_episode(states))
-        timestamps = frame["timestamp"]
+        # states = trim_outliers(states)
+        timestamps = f["timestamp"]
 
+        # Calculate pre-grasp, grasp and post-grasp phases
         phases = detect_grasp_phase(states, timestamps)
-        if phases is None:
-            print("FAILED TO SPLIT PHASES!!! EPISODE", episode_id)
-            continue
+        phase_array = phases_to_arrayses(phases, len(timestamps))
 
-        rows.append({
-            "episode_id": episode_id,
-            "n_steps": frame.shape[0],
-            "duration": float(timestamps.iloc[-1] - timestamps.iloc[0]),
+        if phases is None:
+            print("FAILED TO SPLIT PHASES!!! EPISODE", i)
+
+        row = {
+            "episode_id": i,
+            "n_steps": f.shape[0],
+            "duration": float(timestamps[f.shape[0]-1] - timestamps[0]),
             "states": states,
             "timestamps": timestamps,
-            "phase": phases_to_array(phases, len(timestamps)),
-            "valid": True,
-        })
+            "phase": phase_array
+        }
+        rows.append(row)
 
-    return pd.DataFrame(rows)
+    return pd.DataFrame(rows) 
 
 
-def detect_grasp_phase(
-    states,
-    timestamps,
-    joint_indices=("joint_6", "joint_12"),
-    zero_thresh=3.4,
-    motion_thresh=5.0,
-    min_duration_s=1,
-):
-    """Detect pre-grasp, grasp, and post-grasp phases from joint state trajectories."""
+def detect_grasp_phase(states, timestamps,
+                       joint_indices=("joint_6", "joint_12"),  # 0-based: 6 and 12
+                       zero_thresh=3.4,        # threshold to call "near zero"
+                       motion_thresh=5.0,      # threshold for "movement" before/after
+                       min_duration_s=1):   # optional: min grasp duration in seconds
+    """
+    states: dict with keys 'timestamps' and 'joint_x' for x = 1, ..., 12
+    returns: dict with keys 'grasp_idx'=(start_idx,end_idx),
+             'pre_idx' = (0,start-1), 'post_idx'=(end+1, T-1)
+             if no valid grasp found, returns None
+    """
     j1, j2 = joint_indices
     t = states.shape[0]
-    mask = (
-        (np.abs(states[j1]) <= zero_thresh)
-        & (np.abs(states[j2]) <= zero_thresh)
-    )
 
+    # boolean mask where both are "near zero"
+    mask = (np.abs(states[j1]) <= zero_thresh) & (np.abs(states[j2]) <= zero_thresh)
+
+    # find contiguous True segments
     segments = []
-    in_segment = False
-    for idx, value in enumerate(mask):
-        if value and not in_segment:
-            segment_start = idx
-            in_segment = True
-        elif not value and in_segment:
-            segments.append((segment_start, idx - 1))
-            in_segment = False
-    if in_segment:
-        segments.append((segment_start, t - 1))
+    in_seg = False
+    for i, val in enumerate(mask):
+        if val and not in_seg:
+            seg_start = i
+            in_seg = True
+        elif (not val) and in_seg:
+            seg_end = i - 1
+            segments.append((seg_start, seg_end))
+            in_seg = False
+    if in_seg:
+        segments.append((seg_start, t-1))
 
     if not segments:
         return None
 
-    valid_segments = [
-        (s, e, timestamps.iloc[e] - timestamps.iloc[s])
-        for s, e in segments
-        if (timestamps.iloc[e] - timestamps.iloc[s]) >= min_duration_s
-    ]
+    # compute durations and filter by min_duration_s
+    segs_valid = []
+    for (s,e) in segments:
+        dur = timestamps[e] - timestamps[s]
+        if dur >= min_duration_s:
+            segs_valid.append((s,e,dur))
 
-    if not valid_segments:
-        valid_segments = [
-            (s, e, timestamps.iloc[e] - timestamps.iloc[s]) for s, e in segments
-        ]
+    if not segs_valid:
+        segs_valid = [(s,e,(timestamps[e]-timestamps[s])) for (s,e) in segments]  # fallback
 
-    s, e, _ = max(valid_segments, key=lambda entry: entry[2])
+    # pick the longest valid segment
+    s,e,dur = max(segs_valid, key=lambda x: x[2])
 
-    def has_motion(start, end):
-        if start >= end:
-            return False
-        motion_mask = (
-            (np.abs(states[j1][start:end]) >= motion_thresh)
-            | (np.abs(states[j2][start:end]) >= motion_thresh)
-        )
-        return np.any(motion_mask)
+    # ensure pre and post have motion above motion_thresh
+    # check before s: any index i < s where either joint abs > motion_thresh
+    has_motion_before = np.any((np.abs(states[j1][:s]) >= motion_thresh) | (np.abs(states[j2][:s]) >= motion_thresh)) if s>0 else False
+    has_motion_after  = np.any((np.abs(states[j1][e+1:]) >= motion_thresh) | (np.abs(states[j2][e+1:]) >= motion_thresh)) if e < t-1 else False
 
-    if not (has_motion(0, s) and has_motion(e + 1, t)):
-        for s2, e2, _ in sorted(valid_segments, key=lambda entry: -entry[2]):
-            if has_motion(0, s2) and has_motion(e2 + 1, t):
-                s, e = s2, e2
+    if not (has_motion_before and has_motion_after):
+        # try other segments in decreasing duration order to find one that satisfies the condition
+        segs_sorted = sorted(segs_valid, key=lambda x: -x[2])
+        found = False
+        for (s2,e2,dur2) in segs_sorted:
+            has_motion_before = np.any((np.abs(states[j1][:s2]) >= motion_thresh) | (np.abs(states[j2][:s2]) >= motion_thresh)) if s2>0 else False
+            has_motion_after  = np.any((np.abs(states[j1][e2+1:]) >= motion_thresh) | (np.abs(states[j2][e2+1:]) >= motion_thresh)) if e2 < t-1 else False
+            if has_motion_before and has_motion_after:
+                s,e = s2,e2
+                found = True
                 break
+        if not found:
+            # fallback: choose the longest segment anyway
+            pass
 
-    return {
-        "pre_grasp": (0, max(0, int(s) - 1)),
-        "grasp": (int(s), int(e)),
-        "post_grasp": (min(t - 1, int(e) + 1), t - 1),
-    }
+    return {"pre_grasp": (0, max(0,int(s)-1)),
+            "grasp": (int(s), int(e)),
+            "post_grasp": (min(t-1,int(e)+1), t-1)}
 
 
-def phases_to_array(phase, num_timesteps):
-    """Convert phase boundaries into a timestep-aligned phase array."""
+def phases_to_arrayses(phase, num_timesteps):
     phase_arr = np.empty(num_timesteps, dtype=object)
-    for name, (start, end) in phase.items():
-        phase_arr[start : end + 1] = name
-    return phase_arr
 
+    for name, (s, e) in phase.items():
+        phase_arr[s:e+1] = name
+
+    return phase_arr
 
 def median_filter_episode(states, kernel_size=5):
     return {
@@ -155,17 +166,15 @@ def median_filter_episode(states, kernel_size=5):
         for joint, series in states.items()
     }
 
-
 def savgol_episode(states, window=9, poly=2):
     return {
         joint: savgol_filter(series, window_length=window, polyorder=poly)
         for joint, series in states.items()
     }
 
-
 def trim_outliers(x, z=3.0):
     mu, sigma = np.mean(x), np.std(x)
-    return np.clip(x, mu - z * sigma, mu + z * sigma)
+    return np.clip(x, mu - z*sigma, mu + z*sigma)
 
 
 def remove_bad_episodes(episodes_df, bad_ep_ids):
@@ -240,6 +249,7 @@ def get_clusters(
 
 def main():
     episodes = create_df()
+    episodes["valid"] = True
     labels = get_clusters(episodes)
     print("Cluster labels:", labels)
 

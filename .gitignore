@@ -39,7 +39,7 @@ Thumbs.db
 
 # Files
 .vscode
-datasets/*/
+data/*/
 hardware/
 scripts/huggingface_token.txt
 models/*/
