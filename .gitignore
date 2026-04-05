@@ -41,5 +41,4 @@ Thumbs.db
 .vscode
 data/*/
 hardware/
-scripts/huggingface_token.txt
 models/*/
