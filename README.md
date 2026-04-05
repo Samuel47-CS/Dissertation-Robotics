@@ -2,7 +2,7 @@
 
 This repository contains the code and experiments for my dissertation project exploring whether stylistic variation in human demonstrations can be learned and reproduced by a bimanual robotic system performing a domestic manipulation task.
 
-## Project Overview
+## Project Overview
 
 Robotic policies are typically trained to optimise task completion, often converging to a single "best" behaviour. However, many domestic tasks (e.g., folding, cleaning, organising) can be performed in multiple valid ways that reflect individual user preferences.
 
@@ -19,8 +19,8 @@ Clone the repository:
 
 ```bash
 git clone https://github.com/Samuel47-CS/Dissertation-Robotics.git
-cd Robotics
-pip install -r training/requirements.txt
+cd Dissertation-Robotics
+bash setup.sh
 ```
 
 ## Method
@@ -45,6 +45,7 @@ pip install -r training/requirements.txt
 - videos
     - Videos of trained Bi-SO101 arms with different styles.
 - README.md
+- setup.sh
 
 ### Useful Links:
 - Hugging Face account that contains the full dataset and all models used in this project: https://huggingface.co/the-sam-uel

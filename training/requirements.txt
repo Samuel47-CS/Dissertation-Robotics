@@ -63,7 +63,7 @@ filelock==3.20.0
 fonttools==4.61.1
 fqdn==1.5.1
 frozenlist==1.8.0
-fsspec==2026.2.0
+fsspec==2025.9.0
 funcsigs==1.0.2
 future==1.0.0
 geopandas==1.1.2
@@ -117,7 +117,7 @@ kagglesdk==0.1.15
 kiwisolver==1.4.9
 latex==0.7.0
 latexmk==0.0.2
--e git+https://github.com/huggingface/lerobot.git@4dbbcca496226e00c2281bc0d3ea00610d8c01f7#egg=lerobot&subdirectory=../../lerobot
+#-e git+https://github.com/huggingface/lerobot.git@4dbbcca496226e00c2281bc0d3ea00610d8c01f7#egg=lerobot&subdirectory=../../lerobot
 librt==0.7.8
 llvmlite==0.47.0
 Mako==1.3.10
@@ -142,7 +142,6 @@ networkx==3.6.1
 notebook==6.0.3
 notebook_shim==0.2.4
 numba==0.65.0
-numpy==2.4.3
 opencv-python-headless==4.12.0.88
 orderly-set==5.5.0
 osmnx==2.0.7
