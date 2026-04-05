@@ -18,7 +18,7 @@ The core idea is to treat style as variation in motion trajectories, rather than
 Clone the repository:
 
 ```bash
-git clone https://github.com/Samuel47-CS/Dissertation-Robotics.git
+git clone --recurse-submodules https://github.com/Samuel47-CS/Dissertation-Robotics.git
 cd Dissertation-Robotics
 bash setup.sh
 ```

@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+git submodule add https://github.com/huggingface/lerobot.git 
+
 uv python install 3.12
 uv venv --python 3.12
 source .venv/bin/activate
