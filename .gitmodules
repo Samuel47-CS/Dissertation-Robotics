@@ -1,6 +1,3 @@
-[submodule "lerobot"]
-	path = lerobot
-	url = https://github.com/huggingface/lerobot.git
 [submodule "Robotics/lerobot"]
 	path = Robotics/lerobot
 	url = https://github.com/huggingface/lerobot.git
